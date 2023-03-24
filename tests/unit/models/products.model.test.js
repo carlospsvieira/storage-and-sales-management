@@ -71,4 +71,33 @@ describe("Testing produccts inside Models", () => {
       ).to.be.true;
     });
   });
+
+  describe("createNewProduct", () => {
+    it("inserts a new product into the database", async () => {
+      const newProduct = { id: 1, name: "Martelo de Thor" };
+      executeStub.resolves([[], []]);
+
+      const result = await productsModel.createNewProduct(newProduct);
+
+      expect(
+        executeStub.calledOnceWith(
+          "INSERT INTO StoreManager.products (id, name) VALUES (?, ?)",
+          [newProduct.id, newProduct.name]
+        )
+      ).to.be.true;
+      expect(result).to.deep.equal(newProduct);
+    });
+
+    it("throws an error if the database insert fails", async () => {
+      const newProduct = { id: 1, name: "Martelo de Thor" };
+      const errorMessage = "Database error";
+      executeStub.rejects(new Error(errorMessage));
+
+      try {
+        await productsModel.createNewProduct(newProduct);
+      } catch (error) {
+        expect(error.message).to.equal(errorMessage);
+      }
+    });
+  });
 });
