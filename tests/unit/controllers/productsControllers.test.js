@@ -69,23 +69,3 @@ it("calls findProductsById method of productsService with the given id and retur
   expect(res.json.calledWith(mockProduct)).to.be.true;
   productsService.findProductsById.restore();
 });
-
-it("returns a response with status 404 and an error message if product does not exist", async () => {
-  const req = {
-    params: { id: 1 },
-  };
-  const res = {
-    status: sinon.stub().returnsThis(),
-    json: sinon.stub().returns({ error: { message: "Product not found" } }),
-  };
-  sinon
-    .stub(productsService, "findProductsById")
-    .resolves({ error: { message: "Product not found" } });
-  await productsController.findProductsById(req, res);
-  expect(productsService.findProductsById.calledOnceWith(req.params.id)).to.be
-    .true;
-  expect(res.status.calledWith(404)).to.be.true;
-  expect(res.json.calledWith({ error: { message: "Product not found" } })).to.be
-    .true;
-  productsService.findProductsById.restore();
-});

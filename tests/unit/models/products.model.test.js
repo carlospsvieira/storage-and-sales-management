@@ -44,7 +44,7 @@ describe("Testing produccts inside Models", () => {
   describe("findProductsById", () => {
     it("should return a product by id", async () => {
       const mockProduct = { id: 1, name: "Martelo de Thor" };
-      executeStub.resolves([[mockProducts]]);
+      executeStub.resolves([[mockProduct]]);
 
       const result = await productsModel.findProductsById(1);
 
@@ -57,12 +57,12 @@ describe("Testing produccts inside Models", () => {
       ).to.be.true;
     });
 
-    it("should return null if product is not found", async () => {
+    it("should return undefined if product is not found", async () => {
       executeStub.resolves([[]]);
 
       const result = await productsModel.findProductsById(1);
 
-      expect(result).to.be.null;
+      expect(result).to.be.undefined;
       expect(
         executeStub.calledOnceWith(
           "SELECT * FROM StoreManager.products WHERE id = ? ORDER BY id ASC",

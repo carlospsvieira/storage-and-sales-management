@@ -11,7 +11,7 @@ const findAllProducts = async (_req, res, next) => {
 
 const findProductsById = async (req, res) => {
   const { id } = req.params;
-  const products = await productsService.findProductsById(id);
+  const products = await productsService.findProductsById(Number(id));
   if (products.error) {
     return res.status(404).json(products.error);
   }
