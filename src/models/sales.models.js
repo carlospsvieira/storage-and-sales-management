@@ -7,6 +7,14 @@ const newSaleId = async () => {
   return insertId;
 };
 
+const insertNewSale = async ({ id, productId, quantity }) => {
+  await connection.execute(
+    'INSERT INTO StoreManager.sales_products (sale_id, product_id, quantity) VALUE (?, ?, ?)',
+    [id, productId, quantity],
+  );
+};
+
 module.exports = {
   newSaleId,
+  insertNewSale,
 };
