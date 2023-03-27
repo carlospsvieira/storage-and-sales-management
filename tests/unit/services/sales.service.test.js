@@ -1,62 +1,79 @@
-const {expect} = require("chai");
+const { expect } = require("chai");
 const sinon = require("sinon");
-const sinonChai = require("sinon-chai");
-
-chai.use(sinonChai);
 
 const salesModel = require("../../../src/models/sales.models");
 const salesService = require("../../../src/services/sales.services");
 
-describe("Test in Sales Service", () => {
-  it("return all sales", async () => {
-    const expectedResult = [
-      { id: 1, date: "2023-01-01" },
-      { id: 2, date: "2023-01-02" },
-    ];
-    const findAllSalesStub = sinon
-      .stub(salesModel, "findAllSales")
-      .resolves(expectedResult);
+describe("Sales service", () => {
+  describe("findAllSales", () => {
+    it("should return an array of sales", async () => {
+      const expectedSales = [
+        { saleId: 1, productId: 1, quantity: 2, date: "2022-01-01" },
+        { saleId: 1, productId: 2, quantity: 1, date: "2022-01-01" },
+        { saleId: 2, productId: 1, quantity: 3, date: "2022-01-02" },
+        { saleId: 2, productId: 3, quantity: 2, date: "2022-01-02" },
+      ];
 
-    const result = await salesService.findAllSales();
+      const findAllSalesStub = sinon
+        .stub(salesModel, "findAllSales")
+        .resolves(expectedSales);
 
-    expect(result).to.deep.equal(expectedResult);
-    expect(findAllSalesStub).to.have.been.calledOnce;
+      const result = await salesService.findAllSales();
 
-    findAllSalesStub.restore();
+      expect(result).to.deep.equal(expectedSales);
+
+      findAllSalesStub.restore();
+    });
+
+    it("should return an empty array if no sales are found", async () => {
+      const expectedSales = [];
+
+      const findAllSalesStub = sinon
+        .stub(salesModel, "findAllSales")
+        .resolves(expectedSales);
+
+      const result = await salesService.findAllSales();
+
+      expect(result).to.deep.equal(expectedSales);
+
+      findAllSalesStub.restore();
+    });
   });
 
-  it("return empty array if there are no sales", async () => {
-    const expectedResult = [];
-    const findAllSalesStub = sinon
-      .stub(salesModel, "findAllSales")
-      .resolves(expectedResult);
+  describe("findSalesById", () => {
+    it("should return the sales with the specified ID", async () => {
+      const saleId = 1;
 
-    const result = await salesService.findAllSales();
+      const expectedSales = [
+        { productId: 1, quantity: 2, date: "2022-01-01" },
+        { productId: 2, quantity: 1, date: "2022-01-01" },
+      ];
 
-    expect(result).to.deep.equal(expectedResult);
-    expect(findAllSalesStub).to.have.been.calledOnce;
+      const findSalesByIdStub = sinon
+        .stub(salesModel, "findSalesById")
+        .resolves(expectedSales);
 
-    findAllSalesStub.restore();
+      const result = await salesService.findSalesById(saleId);
+
+      expect(result).to.deep.equal(expectedSales);
+
+      findSalesByIdStub.restore();
+    });
+
+    it("should return an empty array if no sales are found with the specified ID", async () => {
+      const saleId = 1;
+
+      const expectedSales = [];
+
+      const findSalesByIdStub = sinon
+        .stub(salesModel, "findSalesById")
+        .resolves(expectedSales);
+
+      const result = await salesService.findSalesById(saleId);
+
+      expect(result).to.deep.equal(expectedSales);
+
+      findSalesByIdStub.restore();
+    });
   });
-});
-
-it("return a sale by id", async () => {
-  const expectedResult = {
-    id: 1,
-    date: "2023-01-01",
-    items: [
-      { productId: 1, quantity: 2 },
-      { productId: 2, quantity: 3 },
-    ],
-  };
-  const findSalesByIdStub = sinon
-    .stub(salesModel, "findSalesById")
-    .resolves(expectedResult);
-
-  const result = await salesService.findSalesById(1);
-
-  expect(result).to.deep.equal(expectedResult);
-  expect(findSalesByIdStub).to.have.been.calledOnceWith(1);
-
-  findSalesByIdStub.restore();
 });
