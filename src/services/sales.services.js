@@ -1,19 +1,20 @@
 const salesModel = require('../models/sales.models');
 
 const createNewSale = async (sale) => {
-  const id = await salesModel.newSaleId();
+  // Create a new sale record and get the sale ID
+  const saleId = await salesModel.newSaleId();
 
-  const products = sale.map(async ({ quantity, productId }) => salesModel.insertNewSale(
-    {
-      id,
-      productId,
-      quantity,
-    },
-  ));
-  Promise.all(products);
-  const newSale = { id, itemsSold: sale };
-  
-  return newSale;
+  // Insert each item sold into the sales_products table
+  const itemsSold = await Promise.all(
+    sale.map(async (item) => {
+      const { productId, quantity } = item;
+      await salesModel.insertNewSale({ id: saleId, productId, quantity });
+      return { productId, quantity };
+    }),
+  );
+
+  // Return the new sale object
+  return { id: saleId, itemsSold };
 };
 
 const findAllSales = async () => {

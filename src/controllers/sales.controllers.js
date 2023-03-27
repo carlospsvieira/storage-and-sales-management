@@ -1,13 +1,36 @@
 const salesService = require('../services/sales.services');
+const salesModel = require('../models/sales.models');
+const { validateSale } = require('../middlewares/validationSale');
+
+// const createNewSale = async (req, res) => {
+//   const sale = req.body;
+//   try {
+//     const newSale = await salesService.createNewSale(sale);
+//     return res.status(201).json(newSale);
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).send('Failed to create sale');
+//   }
+// };
 
 const createNewSale = async (req, res) => {
   const sale = req.body;
-  try {
-    const newSale = await salesService.createNewSale(sale);
-    return res.status(201).json(newSale);
-  } catch (error) {
-    console.log(error);
+  const errors = await validateSale(sale);
+  if (errors.length > 0) {
+    return res.status(errors[0].status).json({ message: errors[0].message });
   }
+
+  const newSaleId = await salesModel.newSaleId();
+  await Promise.all(
+    sale.map((item) =>
+      salesModel.insertNewSale({
+        id: newSaleId,
+        productId: item.productId,
+        quantity: item.quantity,
+      })),
+  );
+
+  return res.status(201).json({ id: newSaleId, itemsSold: sale });
 };
 
 const findAllSales = async (_req, res) => {
