@@ -7,11 +7,14 @@ const {
 
 const router = express.Router();
 
-router.post(
-  '/',
-  checkForProductIdAndQuantity,
-  quantityGreaterThanZero,
-  salesController.createNewSale,
-);
+router
+  .get('/', salesController.findAllSales)
+  .get('/:id', salesController.findSalesById)
+  .post(
+    '/',
+    checkForProductIdAndQuantity,
+    quantityGreaterThanZero,
+    salesController.createNewSale,
+  );
 
 module.exports = router;
